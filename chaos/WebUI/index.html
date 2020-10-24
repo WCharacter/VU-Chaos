@@ -1,0 +1,44 @@
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<link rel="stylesheet" href="style/reset.css">
+	<link rel="stylesheet" href="style/style.css">
+</head>
+
+<body>
+	<div id="wh">
+		<!-- <div class="marker"></div>	 -->
+	</div>
+	
+	<script type="text/javascript">		
+		var wh = document.getElementById("wh");
+		for (var i = 0; i < 64; i++){
+			var mark_tag = document.createElement("div");
+			var text_tag = document.createElement("div");
+			var text = document.createTextNode("");			
+	
+			text_tag.classList.add("name_text");
+			text_tag.appendChild(text);
+			
+			mark_tag.classList.add("marker");
+			mark_tag.appendChild(text_tag);		
+			
+			wh.appendChild(mark_tag);				
+		}
+		var whMarkers = document.getElementsByClassName("marker");
+		function UpdateWH(x, y, n, show, name, hp){
+			if(show){
+				whMarkers[n-1].style.display = 'block';
+				whMarkers[n-1].style.left = x + 'px';
+				whMarkers[n-1].style.top = y + 'px';
+				whMarkers[n-1].children[0].innerHTML = name + '<br><font color="#EF2424">' + hp + '</font>%';
+			}
+			else{
+				whMarkers[n-1].style.display = 'none';
+				whMarkers[n-1].children[0].innerHTML = "";
+			}
+		}
+	</script>
+</body> 
+
+</html>

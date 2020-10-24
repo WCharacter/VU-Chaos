@@ -1,0 +1,7 @@
+-- Events:Subscribe('BundleMounter:GetBundles', function(bundles)
+--     Events:Dispatch('BundleMounter:LoadBundles', 'levels/mp_003/mp_003', {
+--       'levels/mp_003/mp_003',
+--       'levels/mp_003/common',
+--       'levels/mp_003/conquestlarge'
+--     })
+-- end)

@@ -1,0 +1,12 @@
+{
+	"Name": "Chaos",
+	"Authors": [ "Harakter" ],
+	"Description": "Play in chaos mode where anything can happen!",
+	"Version": "0.0.2-alpha",
+	"HasVeniceEXT": true,
+	"HasWebUI": true,
+	"Tags": ["chaos"],
+	"Dependencies": {
+		"veniceext": "^1.0.0"
+	}
+}
