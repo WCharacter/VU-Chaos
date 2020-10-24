@@ -1,15 +1,3 @@
--- Console:Register('tank_rain', 'Spawns a lot of tanks above you', function()
--- 	NetEvents:SendLocal('VehicleWeapons:TankRain', 'T90', 30, true)
--- end)
-
--- Console:Register('slow_speed', 'Decreases speed of all players', function()
--- 	NetEvents:SendLocal('Players:ChangeSpeed', 0.5, 0.5)
--- end)
-
--- Console:Register('reverse_input', 'Reverses players input', function()
--- 	NetEvents:SendLocal('Players:ReverseInput')
--- end)
-
 showWallHack = false
 markersCleared = true
 
