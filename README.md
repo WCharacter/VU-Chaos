@@ -1,4 +1,4 @@
-# Abot mods
+# About mods
 
 * Chaos mode 
 This is a mod where after some amount of time happens random event, like every player gets random weapons or jump heigh increases.
