@@ -7,15 +7,15 @@ weaponKeys = {}
 jumpStateData = {}
 soldierBodyCompData = {}
 
-event_started = false
+eventStarted = false
 insta_respawn = false
 
 delayCounter = 0
-event_timer = 0
-current_event_index = 0
-between_event_period = 15
-event_end_period = 40 --time in seconds how much one event will be going
-event_end_period_cpy = event_end_period
+eventTimer = 0
+currentEventIndex = 0
+betweenEventPeriod = 15
+eventEndPeriod = 40 --time in seconds how much one event will be going
+eventEndPeriodCpy = eventEndPeriod
 
 function OnPartitionLoaded(partition)
 	local instances = partition.instances
@@ -118,6 +118,7 @@ function VehicleRain(enable, player)
 		return
 	end
 	if enable then
+		eventEndPeriod = 2
 		local players = PlayerManager:GetPlayers()
         if #players ~= 0 then
 			print('Vehicle rain started!')
@@ -141,7 +142,8 @@ function VehicleRain(enable, player)
             end
             SpawnVehicle(players[index], 'GrowlerITV', 40, true)
         end
-    else
+	else
+		eventEndPeriod = eventEndPeriodCpy
 		print('Vehicle rain ended!')
     end
 end
@@ -228,7 +230,7 @@ function HaloJumpAll(enable, player)
 		return
 	end
 	if enable then
-		event_end_period = 10
+		eventEndPeriod = 10
 		print('Halo jump started!')
         ChatManager:Yell('Halo jump!', 10.0)
 		for _, pl in pairs(PlayerManager:GetPlayers()) do
@@ -241,7 +243,7 @@ function HaloJumpAll(enable, player)
 			end       
         end
 	else
-		event_end_period = event_end_period_cpy
+		eventEndPeriod = eventEndPeriodCpy
         print('Halo jump ended!')
     end
 end
@@ -407,7 +409,7 @@ function MixPlayers(enable, player)
 		return
 	end
 	if enable then
-		event_end_period = 2
+		eventEndPeriod = 2
 		print('Player mix started!')
 		local players = PlayerManager:GetPlayers()
 		if #players < 2 then
@@ -448,7 +450,7 @@ function MixPlayers(enable, player)
 			end
 		end
 	else
-		event_end_period = event_end_period_cpy
+		eventEndPeriod = eventEndPeriodCpy
 		print('Player mix ended!')
 	end
 end
@@ -491,7 +493,7 @@ function LowGravity(enable, player)
 		print('Low gravity ended!')
 	end
 end
-
+--TODO: finish this
 function InstaRespawnOnDeath(enable, player)
 	if player ~= nil and enable then
 		ChatManager:Yell('Instant respawn!', 10.0, player)
@@ -507,10 +509,50 @@ function InstaRespawnOnDeath(enable, player)
 	end
 end
 
+function MegaKnife(enable, player)
+	if player ~= nil and enable then
+		ChatManager:Yell('Mega Knife!', 10.0, player)		
+		return
+	end
+	local projectile = 'CDD3A384-8243-A258-E23D-239CC0D52698'
+	if enable then
+		ChatManager:Yell('Mega Knife!', 10.0)
+		ChangeWeaponProjectile('438EC5F6-9217-4A18-BC1E-3E324B6AABD6', '6F12285B-A6D9-4865-AF33-448902C0DD64', projectile, nil) --razor blade
+		ChangeWeaponProjectile('8AC0C3BC-F09C-11DF-87EE-DBDB1600AD3A', '741082C8-07A9-4B20-AB25-1B6CB0EC136A', projectile, nil) --knife
+       
+		print('Mega Knife started!')
+	else
+		ChangeWeaponProjectile('438EC5F6-9217-4A18-BC1E-3E324B6AABD6', '6F12285B-A6D9-4865-AF33-448902C0DD64', 'DDE585ED-C043-48E3-A023-C73D549D8F6E', nil)
+		ChangeWeaponProjectile('8AC0C3BC-F09C-11DF-87EE-DBDB1600AD3A', '741082C8-07A9-4B20-AB25-1B6CB0EC136A', 'BDBFA354-1B1E-4AD3-8826-D7BA1C0C3287', nil)
+		print('Mega Knife ended!')
+	end
+end
+
+function LongKnife(enable, player)
+	if player ~= nil and enable then
+		ChatManager:Yell('Long knife!', 10.0, player)		
+		return
+	end
+	local meleeEntity = MeleeEntityCommonData(ResourceManager:FindInstanceByGuid(Guid('B6CDC48A-3A8C-11E0-843A-AC0656909BCB'), Guid('F21FB5EA-D7A6-EE7E-DDA2-C776D604CD2E')))
+	meleeEntity:MakeWritable()
+	NetEvents:Broadcast('Chaos:LongKnife', enable)
+	if enable then
+		meleeEntity.meleeAttackDistance = 30.0 --2.70000004768
+		meleeEntity.maxAttackHeightDifference = 20.0 --1.20000004768  
+		meleeEntity.invalidMeleeAttackZone = 50.0
+		ChatManager:Yell('Long knife!', 10.0)
+		print('Long knife started!')
+	else
+		meleeEntity.meleeAttackDistance = 2.70000004768 
+		meleeEntity.maxAttackHeightDifference = 1.20000004768 
+		meleeEntity.invalidMeleeAttackZone = 150.0
+		print('Long knife ended!')
+	end
+end
 -- event table
 event_list = {
 	--VehicleRain,
-	--OneHealth,
+	--OneHealth, --wont chage hp on respawn
 	
 	RandomWeapons,
 	SuperJump,
@@ -521,17 +563,19 @@ event_list = {
 	MixPlayers,
 	Wallhack,
 	LowGravity,
+	MegaKnife,
+	LongKnife,
 }
 
 Events:Subscribe('Player:Killed', function(player, inflictor, position, weapon, isRoadKill, isHeadShot, wasVictimInReviveState, info)
-	if insta_respawn and event_started then
+	if insta_respawn and eventStarted then
 		
 	end
 end)
 
 Events:Subscribe('Player:Respawn', function(player)
-	if event_started then
-		event_list[current_event_index](true, player)
+	if eventStarted then
+		event_list[currentEventIndex](true, player)
 	end
 end)
 
@@ -540,29 +584,28 @@ function OnEngineUpdate(dt, simulationDeltaTime)
 		return
 	end
 	delayCounter = delayCounter + dt
-	if MathUtils:Round(delayCounter * 1000) % 1000 == 0 and delayCounter < between_event_period then
-		ChatManager:Yell(MathUtils:Round(between_event_period - delayCounter) .. ' seconds remaining', 0.3)
+	if MathUtils:Round(delayCounter * 1000) % 1000 == 0 and delayCounter < betweenEventPeriod then
+		ChatManager:Yell(MathUtils:Round(betweenEventPeriod - delayCounter) .. ' seconds remaining', 0.3)
 	end
 
-	if delayCounter >= between_event_period and not event_started then
-		event_timer = 0
-		event_started = true
+	if delayCounter >= betweenEventPeriod and not eventStarted then
+		eventTimer = 0
+		eventStarted = true
 		local index = MathUtils:GetRandomInt(1, #event_list)
 		if #event_list > 1 then
-			while index == current_event_index do
+			while index == currentEventIndex do
 				index = MathUtils:GetRandomInt(1, #event_list)
 			end
 		end
-		current_event_index = index
+		currentEventIndex = index
 		event_list[index](true, nil)	
 	end
-	if event_started and event_timer >= event_end_period then
-		event_started = false
+	if eventStarted and eventTimer >= eventEndPeriod then
+		eventStarted = false
 		delayCounter = 0
-		event_list[current_event_index](false, nil)
-		ChatManager:Yell(between_event_period .. ' seconds until next event', 6)
+		event_list[currentEventIndex](false, nil)
 	end
-	if event_started then
-		event_timer = event_timer + dt
+	if eventStarted then
+		eventTimer = eventTimer + dt
 	end	
 end

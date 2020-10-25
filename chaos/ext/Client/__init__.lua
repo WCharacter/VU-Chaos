@@ -51,3 +51,20 @@ Events:Subscribe('Engine:Update', function(delta, simulationDelta)
         return
     end  
 end)
+
+NetEvents:Subscribe('Chaos:LongKnife', function(enable)
+    local meleeInstance = ResourceManager:FindInstanceByGuid(Guid('B6CDC48A-3A8C-11E0-843A-AC0656909BCB'), Guid('F21FB5EA-D7A6-EE7E-DDA2-C776D604CD2E'))
+    if meleeInstance ~= nil then
+        local meleeEntity = MeleeEntityCommonData(meleeInstance)
+        meleeEntity:MakeWritable()
+        if enable then
+            meleeEntity.meleeAttackDistance = 30.0 --2.70000004768
+            meleeEntity.maxAttackHeightDifference = 20.0 --1.20000004768  
+            meleeEntity.invalidMeleeAttackZone = 50.0
+        else
+            meleeEntity.meleeAttackDistance = 2.70000004768 
+            meleeEntity.maxAttackHeightDifference = 1.20000004768 
+            meleeEntity.invalidMeleeAttackZone = 150.0
+        end
+    end
+end)
