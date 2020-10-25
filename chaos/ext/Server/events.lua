@@ -14,7 +14,7 @@ delayCounter = 0
 eventTimer = 0
 currentEventIndex = 0
 betweenEventPeriod = 15
-eventEndPeriod = 40 --time in seconds how much one event will be going
+eventEndPeriod = 30 --time in seconds how much one event will be going
 eventEndPeriodCpy = eventEndPeriod
 
 function OnPartitionLoaded(partition)
@@ -56,6 +56,8 @@ function OnLevelLoaded()
 			end
 		end
 	end
+
+	eventTimer = eventEndPeriod
 end
 
 Events:Subscribe('Level:Destroy', function()
@@ -186,7 +188,7 @@ function RandomWeapons(enable, player)
 		print('Random weapons started!')
 		ChatManager:Yell('Random weapons!', 10.0)
 		for _, pl in pairs(PlayerManager:GetPlayers()) do
-			GiveRandomWeapons(pl, {0, 1}, 3)   
+			GiveRandomWeapons(pl, {0, 1}, 2)   
         end
     else
         print('Random weapons ended!')
@@ -411,43 +413,34 @@ function MixPlayers(enable, player)
 	if enable then
 		eventEndPeriod = 2
 		print('Player mix started!')
-		local players = PlayerManager:GetPlayers()
-		if #players < 2 then
-			print('No players or only one player on the server')
-			return
-		end	
 		ChatManager:Yell('Mix all the players!', 10.0)
-
-		for k=1,#players do
-			if players[#players + 1 - k].soldier ~= nil then
-				local nextPlayer = players[k]
-				while nextPlayer == nil do
-					k = k + 1
-					if k == #players then
-						return --exit when there is no other players
-					end
-					nextPlayer = players[k]
+		local players = PlayerManager:GetPlayers()
+		local alive_players = {}
+		for _, v in pairs(players) do
+			if v ~= nil then
+				if v.soldier ~= nil then
+					alive_players[#alive_players+1] = v
 				end
-				while nextPlayer.soldier == nil do
-					k = k + 1
-					if k == #players then
-						return --exit when there is no other players
-					end
-					nextPlayer = players[k]
-				end
-				if nextPlayer.inVehicle then
-					player:ExitVehicle(true, true)
-				end	
-				if players[#players + 1 - k].inVehicle then
-					player:ExitVehicle(true, true)
-				end
-	
-				local positionVecCpy = nextPlayer.soldier.transform.trans:Clone()
-								
-				-- copying positions
-				nextPlayer.soldier:SetPosition(players[#players + 1 - k].soldier.transform.trans)
-				players[#players + 1 - k].soldier:SetPosition(positionVecCpy)
 			end
+		end
+		if #alive_players < 2 then
+			print('No players or only one player are alive')
+			return
+		end
+		local positions = {}	
+		for k=1,#alive_players do
+			if k == #alive_players then
+				positions[#positions+1] = {players[k], players[k-1].soldier.transform.trans:Clone()}
+				break
+			end
+			if k % 2 == 0 then
+				positions[#positions+1] = {players[k], players[k-1].soldier.transform.trans:Clone()}
+			else
+				positions[#positions+1] = {players[k], players[k+1].soldier.transform.trans:Clone()}
+			end			
+		end
+		for _, v in pairs(positions) do
+			v[1].soldier:SetPosition(v[2])
 		end
 	else
 		eventEndPeriod = eventEndPeriodCpy
@@ -488,7 +481,6 @@ function LowGravity(enable, player)
 		for _, v in pairs(soldierBodyCompData) do
 			v:MakeWritable()
 			v.overrideGravity = false
-			-- v.overrideGravityValue = -9.81
 		end
 		print('Low gravity ended!')
 	end
@@ -506,25 +498,6 @@ function InstaRespawnOnDeath(enable, player)
 		print('Instant respawn started!')
 	else 
 		print('Instant respawn ended!')
-	end
-end
-
-function MegaKnife(enable, player)
-	if player ~= nil and enable then
-		ChatManager:Yell('Mega Knife!', 10.0, player)		
-		return
-	end
-	local projectile = 'CDD3A384-8243-A258-E23D-239CC0D52698'
-	if enable then
-		ChatManager:Yell('Mega Knife!', 10.0)
-		ChangeWeaponProjectile('438EC5F6-9217-4A18-BC1E-3E324B6AABD6', '6F12285B-A6D9-4865-AF33-448902C0DD64', projectile, nil) --razor blade
-		ChangeWeaponProjectile('8AC0C3BC-F09C-11DF-87EE-DBDB1600AD3A', '741082C8-07A9-4B20-AB25-1B6CB0EC136A', projectile, nil) --knife
-       
-		print('Mega Knife started!')
-	else
-		ChangeWeaponProjectile('438EC5F6-9217-4A18-BC1E-3E324B6AABD6', '6F12285B-A6D9-4865-AF33-448902C0DD64', 'DDE585ED-C043-48E3-A023-C73D549D8F6E', nil)
-		ChangeWeaponProjectile('8AC0C3BC-F09C-11DF-87EE-DBDB1600AD3A', '741082C8-07A9-4B20-AB25-1B6CB0EC136A', 'BDBFA354-1B1E-4AD3-8826-D7BA1C0C3287', nil)
-		print('Mega Knife ended!')
 	end
 end
 
@@ -563,7 +536,6 @@ event_list = {
 	MixPlayers,
 	Wallhack,
 	LowGravity,
-	MegaKnife,
 	LongKnife,
 }
 
