@@ -13,7 +13,7 @@ insta_respawn = false
 delayCounter = 0
 eventTimer = 0
 currentEventIndex = 0
-betweenEventPeriod = 15
+betweenEventPeriod = 1
 eventEndPeriod = 30 --time in seconds how much one event will be going
 eventEndPeriodCpy = eventEndPeriod
 
@@ -64,6 +64,7 @@ Events:Subscribe('Level:Destroy', function()
 	print('Level destroyed!')
 	jumpStateData = {}
 	soldierBodyCompData = {}
+	hudData = {}
 end)
 
 Events:Subscribe('Server:RoundReset', function()
@@ -192,30 +193,6 @@ function RandomWeapons(enable, player)
         end
     else
         print('Random weapons ended!')
-    end
-end
-
-function SetHealth(health, player)
-	if player ~= nil then		
-		if player.soldier ~= nil then
-			ChatManager:Yell('One HP!', 10.0, player)
-			player.soldier.health = health
-		end		
-		return
-	end
-	for _, pl in pairs(PlayerManager:GetPlayers()) do
-		if pl.soldier ~= nil then
-			pl.soldier.health = health
-		end         
-	end
-end
-
-function OneHealth(enable, player)
-	if enable then
-		print('One health started!')
-		SetHealth(1.0, player)
-    else
-        print('One health ended!')
     end
 end
 
@@ -429,15 +406,17 @@ function MixPlayers(enable, player)
 		end
 		local positions = {}	
 		for k=1,#alive_players do
-			if k == #alive_players then
-				positions[#positions+1] = {players[k], players[k-1].soldier.transform.trans:Clone()}
-				break
+			if alive_players[k-1].soldier ~= nil then
+				if k == #alive_players then
+					positions[#positions+1] = {alive_players[k], alive_players[k-1].soldier.transform.trans:Clone()}
+					break
+				end			
+				if k % 2 == 0 then
+					positions[#positions+1] = {alive_players[k], alive_players[k-1].soldier.transform.trans:Clone()}
+				else
+					positions[#positions+1] = {alive_players[k], alive_players[k+1].soldier.transform.trans:Clone()}
+				end			
 			end
-			if k % 2 == 0 then
-				positions[#positions+1] = {players[k], players[k-1].soldier.transform.trans:Clone()}
-			else
-				positions[#positions+1] = {players[k], players[k+1].soldier.transform.trans:Clone()}
-			end			
 		end
 		for _, v in pairs(positions) do
 			v[1].soldier:SetPosition(v[2])
@@ -512,7 +491,7 @@ function LongKnife(enable, player)
 	if enable then
 		meleeEntity.meleeAttackDistance = 30.0 --2.70000004768
 		meleeEntity.maxAttackHeightDifference = 20.0 --1.20000004768  
-		meleeEntity.invalidMeleeAttackZone = 50.0
+		meleeEntity.invalidMeleeAttackZone = 5.0
 		ChatManager:Yell('Long knife!', 10.0)
 		print('Long knife started!')
 	else
@@ -522,11 +501,10 @@ function LongKnife(enable, player)
 		print('Long knife ended!')
 	end
 end
+
 -- event table
 event_list = {
-	--VehicleRain,
-	--OneHealth, --wont chage hp on respawn
-	
+	-- VehicleRain,	
 	RandomWeapons,
 	SuperJump,
 	HaloJumpAll,
@@ -553,6 +531,9 @@ end)
 
 function OnEngineUpdate(dt, simulationDeltaTime)
 	if #PlayerManager:GetPlayers() == 0 then
+		return
+	end
+	if #event_list == 0 then
 		return
 	end
 	delayCounter = delayCounter + dt
