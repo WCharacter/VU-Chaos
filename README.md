@@ -1,11 +1,14 @@
-# About mods
+# About
+Random events mode. Works fine on TDM Noshahr Canals (MP_017). 
 
-* Chaos mode 
-This is a mod where after some amount of time happens random event, like every player gets random weapons or jump heigh increases.
-
-* Russian counter strike mode 
-This mod adds sounds from old russian counter strike servers. This sounds are playing when you connect to the server or when you kill someone with a knife.
-
-# Mod list
-* [Chaos mode](https://github.com/WCharacter/VU-Mods/tree/master/chaos)
-* [Russian counter strike mode](https://github.com/WCharacter/VU-Mods/tree/master/RussianCounterStrike)
+Currently available events:
+* Random Weapons - gives all players random set of weapons
+* Super Jump - makes jump height bigger
+* Halo Jump - all players spawning in the sky
+* Ultra C4 - C4 with enhanced damage range
+* Ultra AEK - AEK shots rockets
+* P90 Saiga - P90 shots 12G
+* Mix Players - Players positions are mixed
+* Wallhack - Enables wallhack for all players
+* Low Gravity - Low gravity for all players
+* Long Knife - Knife distance is enhanced
