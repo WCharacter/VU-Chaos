@@ -405,18 +405,16 @@ function MixPlayers(enable, player)
 			return
 		end
 		local positions = {}	
-		for k=1,#alive_players do
-			if alive_players[k-1].soldier ~= nil then
-				if k == #alive_players then
-					positions[#positions+1] = {alive_players[k], alive_players[k-1].soldier.transform.trans:Clone()}
-					break
-				end			
-				if k % 2 == 0 then
-					positions[#positions+1] = {alive_players[k], alive_players[k-1].soldier.transform.trans:Clone()}
-				else
-					positions[#positions+1] = {alive_players[k], alive_players[k+1].soldier.transform.trans:Clone()}
-				end			
-			end
+		for k=2,#alive_players do
+			if k == #alive_players then
+				positions[#positions+1] = {alive_players[k], alive_players[k-1].soldier.transform.trans:Clone()}
+				break
+			end			
+			if k % 2 == 0 then
+				positions[#positions+1] = {alive_players[k], alive_players[k-1].soldier.transform.trans:Clone()}
+			else
+				positions[#positions+1] = {alive_players[k], alive_players[k+1].soldier.transform.trans:Clone()}
+			end			
 		end
 		for _, v in pairs(positions) do
 			v[1].soldier:SetPosition(v[2])
