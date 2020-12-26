@@ -15,7 +15,6 @@ eventTimer = 0
 currentEventIndex = 0
 betweenEventPeriod = 20
 eventEndPeriod = 30 --time in seconds how much one event will be going
-eventEndPeriodCpy = eventEndPeriod
 
 function OnPartitionLoaded(partition)
 	local instances = partition.instances
@@ -121,7 +120,6 @@ function VehicleRain(enable, player)  --currently doesn't work on tdm or any mod
 		return
 	end
 	if enable then
-		eventEndPeriod = 2
 		local players = PlayerManager:GetPlayers()
         if #players ~= 0 then
 			print('Vehicle rain started!')
@@ -146,7 +144,6 @@ function VehicleRain(enable, player)  --currently doesn't work on tdm or any mod
             SpawnVehicle(players[index], 'GrowlerITV', 40, true)
         end
 	else
-		eventEndPeriod = eventEndPeriodCpy
 		print('Vehicle rain ended!')
     end
 end
@@ -209,7 +206,6 @@ function HaloJumpAll(enable, player)
 		return
 	end
 	if enable then
-		eventEndPeriod = 10
 		print('Halo jump started!')
         ChatManager:Yell('Halo jump!', 10.0)
 		for _, pl in pairs(PlayerManager:GetPlayers()) do
@@ -222,7 +218,6 @@ function HaloJumpAll(enable, player)
 			end       
         end
 	else
-		eventEndPeriod = eventEndPeriodCpy
         print('Halo jump ended!')
     end
 end
@@ -388,7 +383,6 @@ function MixPlayers(enable, player)
 		return
 	end
 	if enable then
-		eventEndPeriod = 2
 		print('Player mix started!')
 		ChatManager:Yell('Mix all the players!', 10.0)
 		local players = PlayerManager:GetPlayers()
@@ -420,7 +414,6 @@ function MixPlayers(enable, player)
 			v[1].soldier:SetPosition(v[2])
 		end
 	else
-		eventEndPeriod = eventEndPeriodCpy
 		print('Player mix ended!')
 	end
 end

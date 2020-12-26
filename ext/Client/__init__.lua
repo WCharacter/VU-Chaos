@@ -49,15 +49,17 @@ Events:Subscribe('Engine:Update', function(delta, simulationDelta)
             if vp ~= nil then
                 if vp ~= localPlayer then
                     if vp.soldier ~= nil then
-                        if vp.teamId ~= localPlayer.teamId then    
-                            local transform = vp.soldier.transform.trans:Clone()
-							if transform.z >= 0.1 then
-								transform.y = transform.y + 1.6
-								local worldToScreen = ClientUtils:WorldToScreen(transform)
-								if worldToScreen ~= nil then
-									WebUI:ExecuteJS('UpdateWH('.. worldToScreen.x ..','.. worldToScreen.y..',' .. k .. ',true,' .. '\"' .. vp.name .. '\",' .. MathUtils:Round(vp.soldier.health*100)/100 .. ')')
-								end
-							end                           
+                        if vp.teamId ~= localPlayer.teamId then
+							if vp.soldier.alive then
+								local transform = vp.soldier.transform.trans:Clone()
+								if transform.z >= 0.1 then
+									transform.y = transform.y + 1.6
+									local worldToScreen = ClientUtils:WorldToScreen(transform)
+									if worldToScreen ~= nil then
+										WebUI:ExecuteJS('UpdateWH('.. worldToScreen.x ..','.. worldToScreen.y..',' .. k .. ',true,' .. '\"' .. vp.name .. '\",' .. MathUtils:Round(vp.soldier.health*100)/100 .. ')')
+									end
+								end 
+							end                                                     
                         end 
                     else
                         WebUI:ExecuteJS('UpdateWH(10,10,' .. k .. ',false,null,0)')                   
