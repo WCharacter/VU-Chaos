@@ -13,7 +13,7 @@ insta_respawn = false
 delayCounter = 0
 eventTimer = 0
 currentEventIndex = 0
-betweenEventPeriod = 20
+betweenEventPeriod = 10
 eventEndPeriod = 30 --time in seconds how much one event will be going
 
 function OnPartitionLoaded(partition)
@@ -30,12 +30,6 @@ function OnPartitionLoaded(partition)
                 local weaponName = weaponUnlockAsset.name:match("/U_.+"):sub(4)		
                 weaponKeys[#weaponKeys + 1] = weaponName	
 				weaponTable[weaponName] = weaponUnlockAsset
-			end
-			if ins:Is('JumpStateData') then
-				jumpStateData[#jumpStateData+1] = JumpStateData(ins)
-			end
-			if ins:Is('SoldierBodyComponentData') then				
-				soldierBodyCompData[#soldierBodyCompData+1] = SoldierBodyComponentData(ins)				
 			end
 		end
 	end
@@ -64,6 +58,7 @@ Events:Subscribe('Level:Destroy', function()
 	jumpStateData = {}
 	soldierBodyCompData = {}
 	hudData = {}
+	gameTimeSettings = {}
 end)
 
 Events:Subscribe('Server:RoundReset', function()
@@ -493,6 +488,22 @@ function DVDScreen(enable, player)
 	end
 end
 
+function SuperSpeed(enable, player)
+	if player ~= nil and enable then
+		ChatManager:Yell('Super speed!', 10.0, player)
+		return
+	end
+	if enable then
+		ChatManager:Yell('Super speed!', 10.0)
+		RCON:SendCommand('vu.TimeScale', {"2"})
+		print('Super speed started!')
+	else 
+		RCON:SendCommand('vu.TimeScale', {"1"})
+		print('Super speed ended!')
+	end
+end
+
+
 -- event table
 event_list = {
 	-- VehicleRain, 	
@@ -506,7 +517,8 @@ event_list = {
 	Wallhack,
 	LowGravity,
 	LongKnife,
-	DVDScreen
+	DVDScreen,
+	SuperSpeed
 }
 
 Events:Subscribe('Player:Respawn', function(player)

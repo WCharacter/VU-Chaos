@@ -13,3 +13,4 @@ Currently available events:
 * Low Gravity - Low gravity for all players
 * Long Knife - Knife distance is enhanced
 * DVD Screensaver - You can see the game only through the small box moving on the screen, everything else is hidden
+* Super speed - time scale factor multiplies by 2, the game runs at 2x speed
