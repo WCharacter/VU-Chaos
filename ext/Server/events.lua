@@ -541,8 +541,8 @@ function OnEngineUpdate(dt, simulationDeltaTime)
 		eventTimer = 0
 		eventStarted = true
 		local index = MathUtils:GetRandomInt(1, #event_list)
-		if #event_list > 1 then
-			while index == currentEventIndex do
+		if #event_list > 1 then 
+			while index == currentEventIndex do --making sure we don't start same event again
 				index = MathUtils:GetRandomInt(1, #event_list)
 			end
 		end
