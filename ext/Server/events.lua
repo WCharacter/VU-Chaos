@@ -31,6 +31,12 @@ function OnPartitionLoaded(partition)
                 weaponKeys[#weaponKeys + 1] = weaponName	
 				weaponTable[weaponName] = weaponUnlockAsset
 			end
+			if ins:Is('JumpStateData') then
+				jumpStateData[#jumpStateData+1] = JumpStateData(ins)
+			end
+			if ins:Is('SoldierBodyComponentData') then				
+				soldierBodyCompData[#soldierBodyCompData+1] = SoldierBodyComponentData(ins)				
+			end
 		end
 	end
 end
@@ -225,11 +231,10 @@ function SuperJump(enable, player)
 	if enable then
 		print('Super jump started!')
 		ChatManager:Yell('Super jump!', 10.0)
-		newValue = 16.0
+		newValue = 30.0
 	else
 		print('Super jump ended!')
 	end
-
 	for _, instance in pairs(jumpStateData) do
 		if instance ~= nil then
 			if instance:Is('JumpStateData') then
@@ -394,16 +399,16 @@ function MixPlayers(enable, player)
 			return
 		end
 		local positions = {}	
-		for k=2,#alive_players do
+		for k=1,#alive_players do	
 			if k == #alive_players then
 				positions[#positions+1] = {alive_players[k], alive_players[k-1].soldier.transform.trans:Clone()}
 				break
-			end			
+			end				
 			if k % 2 == 0 then
 				positions[#positions+1] = {alive_players[k], alive_players[k-1].soldier.transform.trans:Clone()}
 			else
 				positions[#positions+1] = {alive_players[k], alive_players[k+1].soldier.transform.trans:Clone()}
-			end			
+			end				
 		end
 		for _, v in pairs(positions) do
 			v[1].soldier:SetPosition(v[2])
@@ -518,7 +523,7 @@ event_list = {
 	LowGravity,
 	LongKnife,
 	DVDScreen,
-	SuperSpeed
+	SuperSpeed,
 }
 
 Events:Subscribe('Player:Respawn', function(player)
