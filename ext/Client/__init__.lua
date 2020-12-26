@@ -93,9 +93,9 @@ NetEvents:Subscribe('Chaos:LongKnife', function(enable)
         local meleeEntity = MeleeEntityCommonData(meleeInstance)
         meleeEntity:MakeWritable()
         if enable then
-            meleeEntity.meleeAttackDistance = 30.0 --2.70000004768
-            meleeEntity.maxAttackHeightDifference = 20.0 --1.20000004768  
-            meleeEntity.invalidMeleeAttackZone = 50.0
+            meleeEntity.meleeAttackDistance = 80.0 --2.70000004768
+            meleeEntity.maxAttackHeightDifference = 40.0 --1.20000004768  
+            meleeEntity.invalidMeleeAttackZone = 5.0
         else
             meleeEntity.meleeAttackDistance = 2.70000004768 
             meleeEntity.maxAttackHeightDifference = 1.20000004768 

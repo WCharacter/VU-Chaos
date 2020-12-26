@@ -472,8 +472,8 @@ function LongKnife(enable, player)
 	meleeEntity:MakeWritable()
 	NetEvents:Broadcast('Chaos:LongKnife', enable)
 	if enable then
-		meleeEntity.meleeAttackDistance = 30.0 --2.70000004768
-		meleeEntity.maxAttackHeightDifference = 20.0 --1.20000004768  
+		meleeEntity.meleeAttackDistance = 80.0 --2.70000004768
+		meleeEntity.maxAttackHeightDifference = 40.0 --1.20000004768  
 		meleeEntity.invalidMeleeAttackZone = 5.0
 		ChatManager:Yell('Long knife!', 10.0)
 		print('Long knife started!')
