@@ -1,8 +1,8 @@
 {
 	"Name": "Chaos",
-	"Authors": [ "Harakter" ],
+	"Authors": [ "Harakter", "Mordestein" ],
 	"Description": "Play in chaos mode where anything can happen!",
-	"Version": "0.0.2-alpha",
+	"Version": "0.0.3-alpha",
 	"HasVeniceEXT": true,
 	"HasWebUI": true,
 	"Tags": ["chaos"],

@@ -13,7 +13,7 @@ insta_respawn = false
 delayCounter = 0
 eventTimer = 0
 currentEventIndex = 0
-betweenEventPeriod = 1
+betweenEventPeriod = 20
 eventEndPeriod = 30 --time in seconds how much one event will be going
 eventEndPeriodCpy = eventEndPeriod
 
@@ -116,7 +116,7 @@ function SpawnVehicle(player, vehicle, amount, yellMessage)
 end
 
 -- events
-function VehicleRain(enable, player) 
+function VehicleRain(enable, player)  --currently doesn't work on tdm or any mode where no vehicles are loaded
 	if player ~= nil and enable then
 		return
 	end
@@ -462,21 +462,6 @@ function LowGravity(enable, player)
 		print('Low gravity ended!')
 	end
 end
---TODO: finish this
-function InstaRespawnOnDeath(enable, player)
-	if player ~= nil and enable then
-		ChatManager:Yell('Instant respawn!', 10.0, player)
-		return
-	end
-	insta_respawn = enable
-
-	if enable then
-		ChatManager:Yell('Low gravity!', 10.0)
-		print('Instant respawn started!')
-	else 
-		print('Instant respawn ended!')
-	end
-end
 
 function LongKnife(enable, player)
 	if player ~= nil and enable then
@@ -500,9 +485,24 @@ function LongKnife(enable, player)
 	end
 end
 
+function DVDScreen(enable, player)
+	if player ~= nil and enable then
+		ChatManager:Yell('DVD Screensaver!', 10.0, player)
+		NetEvents:SendTo('Chaos:DVDScreen', player, enable)
+		return
+	end
+	NetEvents:Broadcast('Chaos:DVDScreen', enable)
+	if enable then
+		ChatManager:Yell('DVD Screensaver!', 10.0)
+		print('DVDScreen started!')
+	else 
+		print('DVDScreen ended!')
+	end
+end
+
 -- event table
 event_list = {
-	-- VehicleRain,	
+	-- VehicleRain, 	
 	RandomWeapons,
 	SuperJump,
 	HaloJumpAll,
@@ -513,13 +513,8 @@ event_list = {
 	Wallhack,
 	LowGravity,
 	LongKnife,
+	DVDScreen
 }
-
-Events:Subscribe('Player:Killed', function(player, inflictor, position, weapon, isRoadKill, isHeadShot, wasVictimInReviveState, info)
-	if insta_respawn and eventStarted then
-		
-	end
-end)
 
 Events:Subscribe('Player:Respawn', function(player)
 	if eventStarted then
@@ -535,8 +530,11 @@ function OnEngineUpdate(dt, simulationDeltaTime)
 		return
 	end
 	delayCounter = delayCounter + dt
-	if MathUtils:Round(delayCounter * 1000) % 1000 == 0 and delayCounter < betweenEventPeriod then
-		ChatManager:Yell(MathUtils:Round(betweenEventPeriod - delayCounter) .. ' seconds remaining', 0.3)
+	
+	if betweenEventPeriod > 2 then 
+		if MathUtils:Round(delayCounter * 1000) % 1000 == 0 and delayCounter < betweenEventPeriod then
+			ChatManager:Yell(MathUtils:Round(betweenEventPeriod - delayCounter) .. ' seconds remaining', 0.2)
+		end
 	end
 
 	if delayCounter >= betweenEventPeriod and not eventStarted then

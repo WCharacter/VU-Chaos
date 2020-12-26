@@ -1,10 +1,15 @@
 showWallHack = false
 markersCleared = true
+showDVDScreen = false
+DVDCleared = false
 
 function ClearWhMarkers()
     for k=1,64 do
         WebUI:ExecuteJS('UpdateWH(0,0,' .. k .. ', false, null, 0)')
     end
+end
+function ClearDVDScreen()
+    WebUI:ExecuteJS('ShowDVD(false)')
 end
 
 Events:Subscribe('Extension:Loaded', function()
@@ -17,13 +22,24 @@ NetEvents:Subscribe('Chaos:WallHack', function(enable)
         ClearWhMarkers()
     end
 end)
+NetEvents:Subscribe('Chaos:DVDScreen', function(enable)
+    showDVDScreen = enable
+    if not showDVDScreen then
+        ClearDVDScreen()
+    end
+end)
+
 Events:Subscribe('Engine:Update', function(delta, simulationDelta) 
+	--wallhack
     if showWallHack then       
         local localPlayer = PlayerManager:GetLocalPlayer()
         if localPlayer == nil then
             return 
         end
-        if not localPlayer.alive and not markersCleared then
+		if localPlayer.soldier == nil then
+			return
+		end
+		if not localPlayer.soldier.alive and not markersCleared then
             ClearWhMarkers()
             markersCleared = true
             return
@@ -50,6 +66,23 @@ Events:Subscribe('Engine:Update', function(delta, simulationDelta)
         markersCleared = false
         return
     end  
+	--dvd screen
+	if showDVDScreen then
+		local localPlayer = PlayerManager:GetLocalPlayer()
+		if localPlayer == nil then
+			return 
+		end
+		if localPlayer.soldier == nil then
+			return
+		end
+		if not localPlayer.soldier.alive and not DVDCleared then
+			ClearDVDScreen()
+			DVDCleared = true
+			return
+		end
+		WebUI:ExecuteJS('ShowDVD(true)')
+		DVDCleared = false
+	end
 end)
 
 NetEvents:Subscribe('Chaos:LongKnife', function(enable)

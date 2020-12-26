@@ -28,3 +28,21 @@
 	color: #F4B777;
 	top:-30px;
 }
+
+/* dvd screensaver */
+
+#dvd {
+  position: absolute;
+  background-size: 100% auto;
+  background-repeat: no-repeat;
+  width: 700px;
+  height: 700px;
+  color: #fff;
+}
+
+.window {
+  display: none;
+  width: 700px;
+  height: 700px;
+  box-shadow: 0 0 0 99999px rgba(0, 0, 0, 1)
+}
