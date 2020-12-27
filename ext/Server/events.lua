@@ -528,9 +528,10 @@ function M240BigMag(enable, player)
 	if enable then
 		ChatManager:Yell('M240 has a bigger mag size!', 10.0)
 		firingFunctionData:MakeWritable()
-		firingFunctionData.fireLogic.rateOfFire = 8000
-		firingFunctionData.fireLogic.clientFireRateMultiplier = 8	
+		firingFunctionData.fireLogic.rateOfFire = 2000
+		firingFunctionData.fireLogic.clientFireRateMultiplier = 0.300000011921
 		firingFunctionData.ammo.magazineCapacity = 4000
+		firingFunctionData.ammo.triggerPullWeight = 0.1
 
 		for _, player in pairs(PlayerManager:GetPlayers()) do
 			if player.soldier ~= nil then		
@@ -545,6 +546,8 @@ function M240BigMag(enable, player)
 	else
 		firingFunctionData.fireLogic.rateOfFire = 650		
 		firingFunctionData.fireLogic.clientFireRateMultiplier = 0.670000016689
+		firingFunctionData.ammo.magazineCapacity = 100
+		firingFunctionData.ammo.triggerPullWeight = 0.34999999404
 		print('M240 is normal now!')
 	end
 end
