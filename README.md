@@ -13,3 +13,5 @@ Currently available events:
 * Low Gravity - Low gravity for all players
 * Long Knife - Knife distance is enhanced
 * DVD Screensaver - You can see the game only through the small box moving on the screen, everything else is hidden
+* Super speed - Increases game speed by 2
+* M240 big magazine - m240 gets a little bit larger magazine

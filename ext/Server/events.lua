@@ -6,6 +6,7 @@ unlockTables = {} -- gadgets
 weaponKeys = {}
 jumpStateData = {}
 soldierBodyCompData = {}
+motionBlurComponentData = {}
 
 eventStarted = false
 insta_respawn = false
@@ -36,6 +37,9 @@ function OnPartitionLoaded(partition)
 			end
 			if ins:Is('SoldierBodyComponentData') then				
 				soldierBodyCompData[#soldierBodyCompData+1] = SoldierBodyComponentData(ins)				
+			end
+			if ins:Is('MotionBlurComponentData') then
+				motionBlurComponentData[#motionBlurComponentData+1] = MotionBlurComponentData(ins)
 			end
 		end
 	end
@@ -73,13 +77,15 @@ end)
 
 function EquipWeapon(player, args)
 	local attachments = {}
-	for i = 3, #args do
-		attachments[i-2] = unlockTables[args[1]][args[i]]
+	if #args >= 3 then
+		for i = 3, #args do
+			attachments[i-2] = unlockTables[args[1]][args[i]]
+		end
 	end
 	local weaponslot = tonumber(args[2]) or player.soldier.weaponsComponent.currentWeaponSlot
 	if(weaponslot == nil) then
-		print('wnpslot is nil')
-    end
+		print('weaponslot is nil')
+	end
 	player:SelectWeapon(weaponslot, weaponTable[args[1]], attachments)
 end
 
@@ -347,11 +353,9 @@ function P90Saiga(enable, player)
 		ChatManager:Yell('P90 shots 12g now!', 10.0, player)
 		if player.soldier ~= nil then		
 			local args = {}
-			local weaponName = 'P90'
-			args[1] = weaponName
+			args[1] = 'P90'
 			args[2] = tostring(player.soldier.weaponsComponent.currentWeaponSlot)	
-			args[3] = 'Acog'
-			--args[4] = ''			
+			args[3] = 'Acog'		
 			EquipWeapon(player, args)
 		end
 		return
@@ -364,8 +368,7 @@ function P90Saiga(enable, player)
 		for _, player in pairs(PlayerManager:GetPlayers()) do
 			if player.soldier ~= nil then		
 				local args = {}
-				local weaponName = 'P90'
-				args[1] = weaponName
+				args[1] = 'P90'
 				args[2] = tostring(player.soldier.weaponsComponent.currentWeaponSlot)	
 				args[3] = 'Acog'		
 				EquipWeapon(player, args)
@@ -508,6 +511,43 @@ function SuperSpeed(enable, player)
 	end
 end
 
+function M240BigMag(enable, player)
+	if player ~= nil and enable then
+		ChatManager:Yell('M240 has a bigger mag size!', 10.0, player)
+		if player.soldier ~= nil then		
+			local args = {}
+			args[1] = 'M240'
+			args[2] = tostring(player.soldier.weaponsComponent.currentWeaponSlot)
+			args[3] = 'Foregrip'		
+			EquipWeapon(player, args)
+		end
+		return
+	end
+
+	local firingFunctionData = FiringFunctionData(ResourceManager:FindInstanceByGuid(Guid('5D6FD6B8-E5BC-11DF-A152-D82BD29AC2ED'), Guid('335B1E8B-8BFF-4A0B-80E7-9F55FB9C25DC')))
+	if enable then
+		ChatManager:Yell('M240 has a bigger mag size!', 10.0)
+		firingFunctionData:MakeWritable()
+		firingFunctionData.fireLogic.rateOfFire = 8000
+		firingFunctionData.fireLogic.clientFireRateMultiplier = 8	
+		firingFunctionData.ammo.magazineCapacity = 4000
+
+		for _, player in pairs(PlayerManager:GetPlayers()) do
+			if player.soldier ~= nil then		
+				local args = {}
+				args[1] = 'M240'
+				args[2] = tostring(player.soldier.weaponsComponent.currentWeaponSlot)
+				args[3] = 'Foregrip'
+				EquipWeapon(player, args)
+			end
+		end         
+		print('M240 has a bigger mag size!')
+	else
+		firingFunctionData.fireLogic.rateOfFire = 650		
+		firingFunctionData.fireLogic.clientFireRateMultiplier = 0.670000016689
+		print('M240 is normal now!')
+	end
+end
 
 -- event table
 event_list = {
@@ -524,6 +564,7 @@ event_list = {
 	LongKnife,
 	DVDScreen,
 	SuperSpeed,
+	M240BigMag,
 }
 
 Events:Subscribe('Player:Respawn', function(player)
