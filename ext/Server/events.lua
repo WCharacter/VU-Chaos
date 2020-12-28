@@ -6,6 +6,7 @@ unlockTables = {} -- gadgets
 weaponKeys = {}
 jumpStateData = {}
 soldierBodyCompData = {}
+motionBlurComponentData = {}
 
 eventStarted = false
 insta_respawn = false
@@ -13,9 +14,8 @@ insta_respawn = false
 delayCounter = 0
 eventTimer = 0
 currentEventIndex = 0
-betweenEventPeriod = 20
+betweenEventPeriod = 10
 eventEndPeriod = 30 --time in seconds how much one event will be going
-eventEndPeriodCpy = eventEndPeriod
 
 function OnPartitionLoaded(partition)
 	local instances = partition.instances
@@ -37,6 +37,9 @@ function OnPartitionLoaded(partition)
 			end
 			if ins:Is('SoldierBodyComponentData') then				
 				soldierBodyCompData[#soldierBodyCompData+1] = SoldierBodyComponentData(ins)				
+			end
+			if ins:Is('MotionBlurComponentData') then
+				motionBlurComponentData[#motionBlurComponentData+1] = MotionBlurComponentData(ins)
 			end
 		end
 	end
@@ -65,6 +68,7 @@ Events:Subscribe('Level:Destroy', function()
 	jumpStateData = {}
 	soldierBodyCompData = {}
 	hudData = {}
+	gameTimeSettings = {}
 end)
 
 Events:Subscribe('Server:RoundReset', function()
@@ -73,13 +77,15 @@ end)
 
 function EquipWeapon(player, args)
 	local attachments = {}
-	for i = 3, #args do
-		attachments[i-2] = unlockTables[args[1]][args[i]]
+	if #args >= 3 then
+		for i = 3, #args do
+			attachments[i-2] = unlockTables[args[1]][args[i]]
+		end
 	end
 	local weaponslot = tonumber(args[2]) or player.soldier.weaponsComponent.currentWeaponSlot
 	if(weaponslot == nil) then
-		print('wnpslot is nil')
-    end
+		print('weaponslot is nil')
+	end
 	player:SelectWeapon(weaponslot, weaponTable[args[1]], attachments)
 end
 
@@ -121,7 +127,6 @@ function VehicleRain(enable, player)  --currently doesn't work on tdm or any mod
 		return
 	end
 	if enable then
-		eventEndPeriod = 2
 		local players = PlayerManager:GetPlayers()
         if #players ~= 0 then
 			print('Vehicle rain started!')
@@ -146,7 +151,6 @@ function VehicleRain(enable, player)  --currently doesn't work on tdm or any mod
             SpawnVehicle(players[index], 'GrowlerITV', 40, true)
         end
 	else
-		eventEndPeriod = eventEndPeriodCpy
 		print('Vehicle rain ended!')
     end
 end
@@ -209,7 +213,6 @@ function HaloJumpAll(enable, player)
 		return
 	end
 	if enable then
-		eventEndPeriod = 10
 		print('Halo jump started!')
         ChatManager:Yell('Halo jump!', 10.0)
 		for _, pl in pairs(PlayerManager:GetPlayers()) do
@@ -222,7 +225,6 @@ function HaloJumpAll(enable, player)
 			end       
         end
 	else
-		eventEndPeriod = eventEndPeriodCpy
         print('Halo jump ended!')
     end
 end
@@ -235,11 +237,10 @@ function SuperJump(enable, player)
 	if enable then
 		print('Super jump started!')
 		ChatManager:Yell('Super jump!', 10.0)
-		newValue = 16.0
+		newValue = 30.0
 	else
 		print('Super jump ended!')
 	end
-
 	for _, instance in pairs(jumpStateData) do
 		if instance ~= nil then
 			if instance:Is('JumpStateData') then
@@ -352,11 +353,9 @@ function P90Saiga(enable, player)
 		ChatManager:Yell('P90 shots 12g now!', 10.0, player)
 		if player.soldier ~= nil then		
 			local args = {}
-			local weaponName = 'P90'
-			args[1] = weaponName
+			args[1] = 'P90'
 			args[2] = tostring(player.soldier.weaponsComponent.currentWeaponSlot)	
-			args[3] = 'Acog'
-			--args[4] = ''			
+			args[3] = 'Acog'		
 			EquipWeapon(player, args)
 		end
 		return
@@ -369,8 +368,7 @@ function P90Saiga(enable, player)
 		for _, player in pairs(PlayerManager:GetPlayers()) do
 			if player.soldier ~= nil then		
 				local args = {}
-				local weaponName = 'P90'
-				args[1] = weaponName
+				args[1] = 'P90'
 				args[2] = tostring(player.soldier.weaponsComponent.currentWeaponSlot)	
 				args[3] = 'Acog'		
 				EquipWeapon(player, args)
@@ -388,7 +386,6 @@ function MixPlayers(enable, player)
 		return
 	end
 	if enable then
-		eventEndPeriod = 2
 		print('Player mix started!')
 		ChatManager:Yell('Mix all the players!', 10.0)
 		local players = PlayerManager:GetPlayers()
@@ -405,22 +402,21 @@ function MixPlayers(enable, player)
 			return
 		end
 		local positions = {}	
-		for k=2,#alive_players do
+		for k=1,#alive_players do	
 			if k == #alive_players then
 				positions[#positions+1] = {alive_players[k], alive_players[k-1].soldier.transform.trans:Clone()}
 				break
-			end			
+			end				
 			if k % 2 == 0 then
 				positions[#positions+1] = {alive_players[k], alive_players[k-1].soldier.transform.trans:Clone()}
 			else
 				positions[#positions+1] = {alive_players[k], alive_players[k+1].soldier.transform.trans:Clone()}
-			end			
+			end				
 		end
 		for _, v in pairs(positions) do
 			v[1].soldier:SetPosition(v[2])
 		end
 	else
-		eventEndPeriod = eventEndPeriodCpy
 		print('Player mix ended!')
 	end
 end
@@ -500,6 +496,77 @@ function DVDScreen(enable, player)
 	end
 end
 
+function SuperSpeed(enable, player)
+	if player ~= nil and enable then
+		ChatManager:Yell('Super speed!', 10.0, player)
+		return
+	end
+	if enable then
+		ChatManager:Yell('Super speed!', 10.0)
+		RCON:SendCommand('vu.TimeScale', {"2"})
+		print('Super speed started!')
+	else 
+		RCON:SendCommand('vu.TimeScale', {"1"})
+		print('Super speed ended!')
+	end
+end
+
+function M240BigMag(enable, player)
+	if player ~= nil and enable then
+		ChatManager:Yell('M240 has a bigger mag size!', 10.0, player)
+		if player.soldier ~= nil then		
+			local args = {}
+			args[1] = 'M240'
+			args[2] = tostring(player.soldier.weaponsComponent.currentWeaponSlot)
+			args[3] = 'Foregrip'		
+			EquipWeapon(player, args)
+		end
+		return
+	end
+
+	local firingFunctionData = FiringFunctionData(ResourceManager:FindInstanceByGuid(Guid('5D6FD6B8-E5BC-11DF-A152-D82BD29AC2ED'), Guid('335B1E8B-8BFF-4A0B-80E7-9F55FB9C25DC')))
+	if enable then
+		ChatManager:Yell('M240 has a bigger mag size!', 10.0)
+		firingFunctionData:MakeWritable()
+		firingFunctionData.fireLogic.rateOfFire = 2000
+		firingFunctionData.fireLogic.clientFireRateMultiplier = 0.300000011921
+		firingFunctionData.ammo.magazineCapacity = 4000
+		firingFunctionData.ammo.triggerPullWeight = 0.1
+
+		for _, player in pairs(PlayerManager:GetPlayers()) do
+			if player.soldier ~= nil then		
+				local args = {}
+				args[1] = 'M240'
+				args[2] = tostring(player.soldier.weaponsComponent.currentWeaponSlot)
+				args[3] = 'Foregrip'
+				EquipWeapon(player, args)
+			end
+		end         
+		print('M240 has a bigger mag size!')
+	else
+		firingFunctionData.fireLogic.rateOfFire = 650		
+		firingFunctionData.fireLogic.clientFireRateMultiplier = 0.670000016689
+		firingFunctionData.ammo.magazineCapacity = 100
+		firingFunctionData.ammo.triggerPullWeight = 0.34999999404
+		print('M240 is normal now!')
+	end
+end
+
+function HighSensitivity(enable, player)
+	if player ~= nil and enable then
+		ChatManager:Yell('High sensitivity!', 10.0, player)
+		NetEvents:SendTo('Chaos:HighSens', player, enable)
+		return
+	end
+	NetEvents:Broadcast('Chaos:HighSens', enable)
+	if enable then
+		ChatManager:Yell('High sensitivity!', 10.0)
+		print('High sensitivity started!')
+	else 
+		print('High sensitivity ended!')
+	end
+end
+
 -- event table
 event_list = {
 	-- VehicleRain, 	
@@ -513,7 +580,10 @@ event_list = {
 	Wallhack,
 	LowGravity,
 	LongKnife,
-	DVDScreen
+	DVDScreen,
+	SuperSpeed,
+	M240BigMag,
+	HighSensitivity,
 }
 
 Events:Subscribe('Player:Respawn', function(player)

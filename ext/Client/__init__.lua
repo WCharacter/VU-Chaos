@@ -3,6 +3,12 @@ markersCleared = true
 showDVDScreen = false
 DVDCleared = false
 
+timer = 0
+highSensVal = 6.0
+
+sensitivityCpy = 1.0
+highSens = false
+
 function ClearWhMarkers()
     for k=1,64 do
         WebUI:ExecuteJS('UpdateWH(0,0,' .. k .. ', false, null, 0)')
@@ -12,10 +18,18 @@ function ClearDVDScreen()
     WebUI:ExecuteJS('ShowDVD(false)')
 end
 
-Events:Subscribe('Extension:Loaded', function()
-    WebUI:Init()
+-- NetEvents
+NetEvents:Subscribe('Chaos:HighSens', function(enable)
+    if enable then
+        sensitivityCpy = InputManager:GetMouseSensitivity()
+        InputManager:SetMouseSensitivity(highSensVal)
+        timer = 0
+        highSens = true
+    else
+        highSens = false
+        InputManager:SetMouseSensitivity(sensitivityCpy)
+    end
 end)
-
 NetEvents:Subscribe('Chaos:WallHack', function(enable)
     showWallHack = enable
     if not showWallHack then
@@ -29,8 +43,15 @@ NetEvents:Subscribe('Chaos:DVDScreen', function(enable)
     end
 end)
 
+-- Events
+Events:Subscribe('Extension:Loaded', function()
+    WebUI:Init()
+end)
+Events:Subscribe('Level:Loaded', function()
+    print('Chaos mod v0.0.5-alpha')
+end)
 Events:Subscribe('Engine:Update', function(delta, simulationDelta) 
-	--wallhack
+	-- Wallhack
     if showWallHack then       
         local localPlayer = PlayerManager:GetLocalPlayer()
         if localPlayer == nil then
@@ -49,15 +70,17 @@ Events:Subscribe('Engine:Update', function(delta, simulationDelta)
             if vp ~= nil then
                 if vp ~= localPlayer then
                     if vp.soldier ~= nil then
-                        if vp.teamId ~= localPlayer.teamId then    
-                            local transform = vp.soldier.transform.trans:Clone()
-							if transform.z >= 0.1 then
-								transform.y = transform.y + 1.6
-								local worldToScreen = ClientUtils:WorldToScreen(transform)
-								if worldToScreen ~= nil then
-									WebUI:ExecuteJS('UpdateWH('.. worldToScreen.x ..','.. worldToScreen.y..',' .. k .. ',true,' .. '\"' .. vp.name .. '\",' .. MathUtils:Round(vp.soldier.health*100)/100 .. ')')
-								end
-							end                           
+                        if vp.teamId ~= localPlayer.teamId then
+							if vp.soldier.alive then
+								local transform = vp.soldier.transform.trans:Clone()
+								if transform.z >= 0.1 then
+									transform.y = transform.y + 1.6
+									local worldToScreen = ClientUtils:WorldToScreen(transform)
+									if worldToScreen ~= nil then
+										WebUI:ExecuteJS('UpdateWH('.. worldToScreen.x ..','.. worldToScreen.y..',' .. k .. ',true,' .. '\"' .. vp.name .. '\",' .. MathUtils:Round(vp.soldier.health*100)/100 .. ')')
+									end
+								end 
+							end                                                     
                         end 
                     else
                         WebUI:ExecuteJS('UpdateWH(10,10,' .. k .. ',false,null,0)')                   
@@ -84,7 +107,16 @@ Events:Subscribe('Engine:Update', function(delta, simulationDelta)
 		end
 		WebUI:ExecuteJS('ShowDVD(true)')
 		DVDCleared = false
-	end
+    end
+    
+    --high sensitivity
+    if highSens then
+        timer = timer + delta
+        if MathUtils:Round(timer * 1000) % 1000 >= 0 then
+            InputManager:SetMouseSensitivity(highSensVal)
+            timer = 0
+        end
+    end
 end)
 
 NetEvents:Subscribe('Chaos:LongKnife', function(enable)
