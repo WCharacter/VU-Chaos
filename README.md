@@ -13,4 +13,5 @@ Currently available events:
 * Low Gravity - Low gravity for all players
 * Long Knife - Knife distance is enhanced
 * DVD Screensaver - You can see the game only through the small box moving on the screen, everything else is hidden
+* M240 Bigger mag - Magazine for M240 now contains 4000 bullets
 * High mouse sensitivity - Increased mouse sensitivity for all player
