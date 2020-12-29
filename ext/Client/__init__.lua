@@ -6,7 +6,7 @@ DVDCleared = false
 timer = 0
 highSensVal = 6.0
 
-sensitivityCpy = 1.0
+sensitivityCpy = -1.0
 highSens = false
 
 function ClearWhMarkers()
@@ -21,13 +21,17 @@ end
 -- NetEvents
 NetEvents:Subscribe('Chaos:HighSens', function(enable)
     if enable then
-        sensitivityCpy = InputManager:GetMouseSensitivity()
-        InputManager:SetMouseSensitivity(highSensVal)
-        timer = 0
-        highSens = true
+        if InputManager:GetMouseSensitivity() ~= highSensVal then
+            sensitivityCpy = InputManager:GetMouseSensitivity()
+            InputManager:SetMouseSensitivity(highSensVal)
+            timer = 0
+            highSens = true
+        end
     else
-        highSens = false
-        InputManager:SetMouseSensitivity(sensitivityCpy)
+        if sensitivityCpy ~= -1 then
+            highSens = false
+            InputManager:SetMouseSensitivity(sensitivityCpy)
+        end
     end
 end)
 NetEvents:Subscribe('Chaos:WallHack', function(enable)
@@ -115,6 +119,12 @@ Events:Subscribe('Engine:Update', function(delta, simulationDelta)
         if MathUtils:Round(timer * 1000) % 1000 >= 0 then
             InputManager:SetMouseSensitivity(highSensVal)
             timer = 0
+        end
+    else
+        if sensitivityCpy ~= -1 then
+            if InputManager:GetMouseSensitivity() ~= sensitivityCpy then
+                InputManager:SetMouseSensitivity(sensitivityCpy)
+            end
         end
     end
 end)

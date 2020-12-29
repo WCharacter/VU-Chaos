@@ -14,7 +14,7 @@ insta_respawn = false
 delayCounter = 0
 eventTimer = 0
 currentEventIndex = 0
-betweenEventPeriod = 10
+betweenEventPeriod = 5
 eventEndPeriod = 30 --time in seconds how much one event will be going
 
 function OnPartitionLoaded(partition)
@@ -531,7 +531,6 @@ function M240BigMag(enable, player)
 		firingFunctionData.fireLogic.rateOfFire = 2000
 		firingFunctionData.fireLogic.clientFireRateMultiplier = 0.300000011921
 		firingFunctionData.ammo.magazineCapacity = 4000
-		firingFunctionData.ammo.triggerPullWeight = 0.1
 
 		for _, player in pairs(PlayerManager:GetPlayers()) do
 			if player.soldier ~= nil then		
@@ -547,7 +546,6 @@ function M240BigMag(enable, player)
 		firingFunctionData.fireLogic.rateOfFire = 650		
 		firingFunctionData.fireLogic.clientFireRateMultiplier = 0.670000016689
 		firingFunctionData.ammo.magazineCapacity = 100
-		firingFunctionData.ammo.triggerPullWeight = 0.34999999404
 		print('M240 is normal now!')
 	end
 end
