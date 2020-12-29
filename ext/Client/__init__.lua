@@ -52,7 +52,7 @@ Events:Subscribe('Extension:Loaded', function()
     WebUI:Init()
 end)
 Events:Subscribe('Level:Loaded', function()
-    print('Chaos mod v0.0.5-alpha')
+    print('Chaos mod v0.0.6-alpha')
 end)
 Events:Subscribe('Engine:Update', function(delta, simulationDelta) 
 	-- Wallhack
