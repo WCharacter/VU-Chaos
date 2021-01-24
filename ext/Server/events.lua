@@ -1,5 +1,4 @@
 -- globals
-vehicleTable = {}
 
 weaponTable = {} -- weapons
 unlockTables = {} -- gadgets
@@ -21,11 +20,6 @@ function OnPartitionLoaded(partition)
 	local instances = partition.instances
 	for _, ins in pairs(instances) do
 		if ins ~= nil then
-			if ins:Is('VehicleBlueprint') then			
-				local vehicleBlueprint = VehicleBlueprint(ins)				
-				local vehicleName = vehicleBlueprint.name:gsub(".+/.+/","")			
-				vehicleTable[vehicleName] = vehicleBlueprint
-			end
 			if ins:Is('SoldierWeaponUnlockAsset') then					
 				local weaponUnlockAsset = SoldierWeaponUnlockAsset(ins)			
                 local weaponName = weaponUnlockAsset.name:match("/U_.+"):sub(4)		
@@ -67,13 +61,11 @@ Events:Subscribe('Level:Destroy', function()
 	print('Level destroyed!')
 	jumpStateData = {}
 	soldierBodyCompData = {}
-	hudData = {}
-	gameTimeSettings = {}
 end)
 
-Events:Subscribe('Server:RoundReset', function()
-	print('Round reset!')	
-end)
+-- Events:Subscribe('Server:RoundReset', function()
+	-- print('Round reset!')	
+-- end)
 
 function EquipWeapon(player, args)
 	local attachments = {}
@@ -89,72 +81,7 @@ function EquipWeapon(player, args)
 	player:SelectWeapon(weaponslot, weaponTable[args[1]], attachments)
 end
 
-function SpawnVehicle(player, vehicle, amount, yellMessage)	
-    if player.soldier ~= nil then
-        if yellMessage then
-            ChatManager:Yell('A lot of ' .. vehicle .. ' were spawned above ' .. player.name, 10.00)
-        end
-		for _=1, amount do
-			local distance_x = 3 + MathUtils:GetRandom(-10, 12)
-			local distance_z = 4 + MathUtils:GetRandom(-6, 12)
-			local height = 600 + MathUtils:GetRandom(-16, 50)
-
-			local transform = LinearTransform()
-
-			transform.trans.x = player.soldier.transform.trans.x + distance_x
-			transform.trans.y = player.soldier.transform.trans.y + height
-			transform.trans.z = player.soldier.transform.trans.z + distance_z
-
-			local params = EntityCreationParams()
-			params.transform = transform
-			params.networked = true
-
-			local blueprint = vehicleTable[vehicle]
-
-			local vehicleEntityBus = EntityBus(EntityManager:CreateEntitiesFromBlueprint(blueprint, params))
-
-			for __, entity in pairs(vehicleEntityBus.entities) do
-				entity = Entity(entity)
-				entity:Init(Realm.Realm_ClientAndServer, true)
-			end
-		end
-	end
-end
-
 -- events
-function VehicleRain(enable, player)  --currently doesn't work on tdm or any mode where no vehicles are loaded
-	if player ~= nil and enable then
-		return
-	end
-	if enable then
-		local players = PlayerManager:GetPlayers()
-        if #players ~= 0 then
-			print('Vehicle rain started!')
-			local index = MathUtils:GetRandomInt(1, #players)
-			local loopDetector = 0
-			while players[index].soldier == nil do
-				index = MathUtils:GetRandomInt(1, #players)
-				loopDetector = loopDetector + 1
-				if loopDetector > 1000 then
-					print('No alive players to spawn vehicles on')
-					return
-				end
-			end
-            loopDetector = 0
-            while not players[index].alive do
-                index = MathUtils:GetRandomInt(1, #players)
-                loopDetector = loopDetector + 1
-                if loopDetector > 1000 then
-                    return
-                end
-            end
-            SpawnVehicle(players[index], 'GrowlerITV', 40, true)
-        end
-	else
-		print('Vehicle rain ended!')
-    end
-end
-
 function GiveRandomWeapons(player, weaponSlots, attachmentsAmount)
 	if player.soldier ~= nil then
 		if weaponSlots == nil then
@@ -563,7 +490,6 @@ end
 
 -- event table
 event_list = {
-	-- VehicleRain, 	
 	RandomWeapons,
 	SuperJump,
 	HaloJumpAll,
